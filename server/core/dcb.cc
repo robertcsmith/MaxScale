@@ -1929,8 +1929,11 @@ static void dcb_hangup_foreach_worker(MXB_WORKER* worker, struct server* server)
     {
         if (dcb->state == DCB_STATE_POLLING && dcb->server && dcb->server == server)
         {
-            dcb->dcb_errhandle_called = true;
-            dcb->func.hangup(dcb);
+            if (!dcb->dcb_errhandle_called)
+            {
+                dcb->func.hangup(dcb);
+                dcb->dcb_errhandle_called = true;
+            }
         }
     }
 }
@@ -2675,13 +2678,13 @@ static uint32_t dcb_process_poll_events(DCB* dcb, uint32_t events)
 
         if (!dcb->dcb_errhandle_called)
         {
-            dcb->dcb_errhandle_called = true;
-
             if (dcb_session_check(dcb, "hangup EPOLLHUP"))
             {
                 DCB_EH_NOTICE("Calling dcb->func.hangup(%p)", dcb);
                 dcb->func.hangup(dcb);
             }
+
+            dcb->dcb_errhandle_called = true;
         }
     }
 
@@ -2702,13 +2705,13 @@ static uint32_t dcb_process_poll_events(DCB* dcb, uint32_t events)
 
         if (!dcb->dcb_errhandle_called)
         {
-            dcb->dcb_errhandle_called = true;
-
             if (dcb_session_check(dcb, "hangup EPOLLRDHUP"))
             {
                 DCB_EH_NOTICE("Calling dcb->func.hangup(%p)", dcb);
                 dcb->func.hangup(dcb);
             }
+
+            dcb->dcb_errhandle_called = true;
         }
     }
 #endif
