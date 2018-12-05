@@ -2890,7 +2890,7 @@ void poll_fake_hangup_event(DCB* dcb)
  */
 static bool dcb_session_check(DCB* dcb, const char* function)
 {
-    if (dcb->session)
+    if (dcb->session || dcb->persistentstart)
     {
         return true;
     }
